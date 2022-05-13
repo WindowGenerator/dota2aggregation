@@ -1,16 +1,18 @@
 .PHONY: all
 
-SRC := ./src
 CMD := poetry run
 
 all: install-deps pre-commit test
 
 test:
-	$(CMD) pytest
+	$(CMD) pytest -vv
 
 pre-commit:
 	$(CMD) pre-commit run --all-files
 
 install-deps:
-	poetry install
+	@poetry install
 	$(CMD) pre-commit install
+
+run-server:
+	$(CMD) python -m src.main
