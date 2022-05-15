@@ -1,3 +1,5 @@
+import logging
+
 from typing import Dict, Union
 
 import jsonschema
@@ -6,6 +8,9 @@ from aiohttp import ClientSession
 from src.dota2api.endpoints import GET_MATCHES_URL
 from src.dota2api.schemas import PLAYERS_SCHEMA
 from src.dota2api.types import AccountId, Dota2ApiError
+
+
+logger = logging.getLogger(__name__)
 
 
 async def get_recent_mathes_by_account(
@@ -44,9 +49,9 @@ async def get_recent_mathes_by_account(
 
         try:
             jsonschema.validate(body, PLAYERS_SCHEMA)
-        except jsonschema.exceptions.ValidationError as exc:
+        except jsonschema.exceptions.ValidationError:
             return Dota2ApiError(
-                error=f"validation error for account with id: '{account_id}'{str(exc)}",
+                error=f"validation error for account with id: '{account_id}', Invalid schema",
                 code=400,
             )
 

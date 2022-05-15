@@ -7,6 +7,7 @@ MATHES_SCHEMA = {
                 "type": "object",
                 "properties": {
                     "account_id": {"type": ["number", "null"]},
+                    "name": {"type": ["string", "null"]},
                     "kills": {"type": "number"},
                     "assists": {"type": "number"},
                     "deaths": {"type": "number"},

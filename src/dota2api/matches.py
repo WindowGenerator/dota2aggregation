@@ -30,9 +30,9 @@ async def get_match_info(
 
         try:
             jsonschema.validate(body, MATHES_SCHEMA)
-        except jsonschema.exceptions.ValidationError as exc:
+        except jsonschema.exceptions.ValidationError:
             return Dota2ApiError(
-                error=f"validation error for match with id: '{match_id}'{str(exc)}",
+                error=f"validation error for match with id: '{match_id}', Invalid schema",
                 code=400,
             )
 

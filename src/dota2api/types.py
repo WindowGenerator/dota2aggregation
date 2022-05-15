@@ -10,3 +10,6 @@ class Dota2ApiError(Exception):
         super().__init__(self, *args, **kwargs)
         self.error = error
         self.code = code
+
+    def __repr__(self) -> str:
+        return f"<{Dota2ApiError}> error: {self.error}, code: {self.code}"

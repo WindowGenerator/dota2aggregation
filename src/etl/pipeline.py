@@ -2,7 +2,7 @@ from typing import Dict, List, Tuple
 
 from aiohttp import ClientSession
 from src.dota2api.matches import get_match_info
-from src.dota2api.players import get_recent_mathes_by_account
+from src.dota2api.recent_matches import get_recent_mathes_by_account
 from src.dota2api.types import AccountId, Dota2ApiError
 
 
@@ -17,6 +17,10 @@ class TransformError(Exception):
     pass
 
 
+class PipelineError(Exception):
+    pass
+
+
 async def pipeline(
     client_session: ClientSession,
     account_id: AccountId,
@@ -28,7 +32,7 @@ async def pipeline(
 
     try:
         async for match_info in extract(client_session, account_id, limit):
-            kda_and_kp_list.append(transform(account_id, match_info))
+            kda_and_kp_list.append(transform(account_id, player_name, match_info))
             total_games += 1
 
         data_to_locate = agregate_all_transformed_data(
@@ -38,10 +42,10 @@ async def pipeline(
         await locate(account_id, data_to_locate)
 
     except TransformError as exc:
-        raise exc
+        raise PipelineError(exc)
 
     except Dota2ApiError as exc:
-        raise exc
+        raise PipelineError(exc.error)
 
     return data_to_locate
 
@@ -50,7 +54,7 @@ async def locate(account_id: AccountId, data_to_locate: Dict) -> None:
     print(data_to_locate)
 
 
-def transform(account_id: AccountId, match_info: Dict) -> Tuple[KDA, KP]:
+def transform(account_id: AccountId, name: str, match_info: Dict) -> Tuple[KDA, KP]:
     # Here I decided to use a tuple,
     # because I thought in advance about the performance when allocating memory for other data structures,
     # and python allocates much less memory for a tuple than for the same NamedTuple
@@ -67,7 +71,7 @@ def transform(account_id: AccountId, match_info: Dict) -> Tuple[KDA, KP]:
         else:
             kills_dire += player["kills"]
 
-        if str(player["account_id"]) == account_id:
+        if str(player["account_id"]) == str(account_id) or player["name"] == name:
             kills, deaths, assists = (
                 player["kills"],
                 player["deaths"],

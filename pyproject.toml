@@ -44,9 +44,6 @@ known_third_party = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = [
-    "tests"
-]
 asyncio_mode="auto"
 
 [build-system]

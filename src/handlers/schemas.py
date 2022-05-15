@@ -4,4 +4,5 @@ AGREGATE_SCHEMA = {
         "account_id": {"type": "number"},
         "name": {"type": "string"},
     },
+    "additionalProperties": False,
 }
