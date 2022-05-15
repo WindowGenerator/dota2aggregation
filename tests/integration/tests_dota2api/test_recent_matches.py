@@ -1,26 +1,30 @@
 import pytest
 
 from aiohttp import ClientSession
-from src.dota2api.players import get_recent_mathes_by_account
+from src.dota2api.recent_matches import get_recent_mathes_by_account
 from src.dota2api.types import Dota2ApiError
-from tests.dummy_data.datatest import (
+from tests.data.simple_data import (
     ACCOUNT_WITHOUT_DOTA_2_ID,
-    DENDI_ACCOUNT_ID,
+    EXIST_ACCOUNT_ID,
     INVALID_ACCOUNT_ID,
     NOT_EXIST_ACCOUNT_ID,
 )
 
 
 @pytest.mark.asyncio
-async def test_players_with_dendi(client_session: ClientSession) -> None:
-    account_info = await get_recent_mathes_by_account(DENDI_ACCOUNT_ID, client_session)
+async def test_recent_matches_with_exist_account_id(
+    client_session: ClientSession,
+) -> None:
+    account_info = await get_recent_mathes_by_account(EXIST_ACCOUNT_ID, client_session)
 
-    assert "error" not in account_info
+    assert not isinstance(account_info, Dota2ApiError)
     assert account_info is not None
 
 
 @pytest.mark.asyncio
-async def test_players_with_not_exist_acount(client_session: ClientSession) -> None:
+async def test_recent_matches_with_not_exist_acount(
+    client_session: ClientSession,
+) -> None:
     account_info = await get_recent_mathes_by_account(
         NOT_EXIST_ACCOUNT_ID, client_session
     )
@@ -34,7 +38,9 @@ async def test_players_with_not_exist_acount(client_session: ClientSession) -> N
 
 
 @pytest.mark.asyncio
-async def test_players_with_invalid_account_id(client_session: ClientSession) -> None:
+async def test_recent_matches_with_invalid_account_id(
+    client_session: ClientSession,
+) -> None:
     account_info = await get_recent_mathes_by_account(
         INVALID_ACCOUNT_ID, client_session
     )
@@ -48,7 +54,7 @@ async def test_players_with_invalid_account_id(client_session: ClientSession) ->
 
 
 @pytest.mark.asyncio
-async def test_players_with_account_without_dota_2(
+async def test_recent_matches_with_account_without_dota_2(
     client_session: ClientSession,
 ) -> None:
     account_info = await get_recent_mathes_by_account(
@@ -61,3 +67,15 @@ async def test_players_with_account_without_dota_2(
         == f"account with id: '{ACCOUNT_WITHOUT_DOTA_2_ID}' not exist or account not played in dota 2"
     )
     assert account_info.code == 400
+
+
+@pytest.mark.asyncio
+async def test_recent_mathes_with_limit(
+    client_session: ClientSession,
+) -> None:
+    account_info = await get_recent_mathes_by_account(
+        EXIST_ACCOUNT_ID, client_session, limit=4
+    )
+
+    assert not isinstance(account_info, Dota2ApiError)
+    assert len(account_info) == 4
