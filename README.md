@@ -17,3 +17,9 @@ make -f Makefile install-deps
 ```bash
 make -f Makefile run-server
 ```
+
+# How to use this stuff:
+For example:
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"account_id": 86745912, "name": "test"}' 0.0.0.0:8080/agregate
+```
