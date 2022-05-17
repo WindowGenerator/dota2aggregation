@@ -21,8 +21,6 @@ async def agregate(request: Request):
 
         jsonschema.validate(body, AGREGATE_SCHEMA)
 
-        print(body)
-
         result = await pipeline(session, body["account_id"], body["name"], 1)
 
     except jsonschema.exceptions.ValidationError as exc:
