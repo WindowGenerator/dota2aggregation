@@ -16,6 +16,7 @@ logger.setLevel(LOGGING_LEVEL)
 
 
 async def http_client_session_ctx(app: Application) -> AsyncGenerator:
+    logger.info("Start ClientSession")
     app["session"] = aiohttp.ClientSession()
 
     yield

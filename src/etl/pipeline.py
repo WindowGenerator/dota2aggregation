@@ -32,7 +32,7 @@ async def pipeline(
 
     try:
         async for match_info in extract(client_session, account_id, limit):
-            kda_and_kp_list.append(transform(account_id, player_name, match_info))
+            kda_and_kp_list.append(transform(account_id, match_info))
             total_games += 1
 
         data_to_locate = agregate_all_transformed_data(
@@ -54,7 +54,7 @@ async def locate(account_id: AccountId, data_to_locate: Dict) -> None:
     print(data_to_locate)
 
 
-def transform(account_id: AccountId, name: str, match_info: Dict) -> Tuple[KDA, KP]:
+def transform(account_id: AccountId, match_info: Dict) -> Tuple[KDA, KP]:
     # Here I decided to use a tuple,
     # because I thought in advance about the performance when allocating memory for other data structures,
     # and python allocates much less memory for a tuple than for the same NamedTuple
@@ -71,7 +71,7 @@ def transform(account_id: AccountId, name: str, match_info: Dict) -> Tuple[KDA, 
         else:
             kills_dire += player["kills"]
 
-        if str(player["account_id"]) == str(account_id) or player["name"] == name:
+        if str(player["account_id"]) == str(account_id):
             kills, deaths, assists = (
                 player["kills"],
                 player["deaths"],

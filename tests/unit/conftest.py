@@ -1,9 +1,11 @@
-from contextlib import asynccontextmanager
-from typing import Dict, List
+from contextlib import contextmanager
+from typing import Dict
 
 import pytest_asyncio
 
 from aiohttp import ClientSession
+from src.dota2api.endpoints import GET_MATCH_URL, GET_MATCHES_URL
+from src.dota2api.types import AccountId, MatchId
 
 
 @pytest_asyncio.fixture
@@ -28,20 +30,45 @@ class MockResponse:
 
 
 class MockMatches:
-    def __init__(self, body, status: int = 200) -> None:
-        self._matches_generator = iter(body)
+    def __init__(self, body, status: int = 200, match_id: MatchId = None) -> None:
         self._status = status
+        self._body = body
+        self._match_id = match_id
 
-    @asynccontextmanager
-    async def mock_matches(self, *args, **kwargs) -> Dict:
-        yield MockResponse(next(self._matches_generator), self._status)
+    @contextmanager
+    def mock(self, m):
+        if not isinstance(self._body, list):
+            m.get(
+                GET_MATCH_URL.format(match_id=self._match_id),
+                payload=self._body,
+                status=self._status,
+            )
+        else:
+            for match in self._body:
+                match_id = match["match_id"]
+
+                m.get(
+                    GET_MATCH_URL.format(match_id=match_id),
+                    payload=match,
+                    status=self._status,
+                )
+        yield
 
 
 class MockRecentMatches:
-    def __init__(self, body, status: int = 200) -> None:
+    def __init__(
+        self, account_id: AccountId, body, status: int = 200, limit: int = 10
+    ) -> None:
         self._body = body
         self._status = status
+        self._account_id = account_id
+        self._limit = limit
 
-    @asynccontextmanager
-    async def mock_recent_matches(self, *args, **kwargs) -> List:
-        yield MockResponse(self._body, self._status)
+    @contextmanager
+    def mock(self, m):
+        m.get(
+            f"{GET_MATCHES_URL.format(account_id=self._account_id)}?limit={self._limit}",
+            payload=self._body,
+            status=self._status,
+        )
+        yield

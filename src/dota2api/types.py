@@ -12,4 +12,4 @@ class Dota2ApiError(Exception):
         self.code = code
 
     def __repr__(self) -> str:
-        return f"<{Dota2ApiError}> error: {self.error}, code: {self.code}"
+        return f"<{self.__class__.__name__}>, error: {self.error}, code: {self.code}"

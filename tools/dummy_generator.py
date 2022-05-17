@@ -16,18 +16,22 @@ def convert_and_write_matches(
     for match_info in matches_info:
         players = []
         for player in match_info["players"]:
-            players.append(
-                {
-                    "account_id": player["account_id"],
-                    "kills": player["kills"],
-                    "assists": player["assists"],
-                    "deaths": player["deaths"],
-                    "isRadiant": player["isRadiant"],
-                }
-            )
+            try:
+                players.append(
+                    {
+                        "account_id": player["account_id"],
+                        "kills": player["kills"],
+                        "assists": player["assists"],
+                        "deaths": player["deaths"],
+                        "isRadiant": player["isRadiant"],
+                    }
+                )
+            except Exception:
+                print(player)
 
         converted_mathes_info.append(
             {
+                "match_id": match_info["match_id"],
                 "players": players,
             }
         )
@@ -49,8 +53,8 @@ def convert_and_write_account_matches(
 
 
 async def main() -> None:
-    dir_to_write = "./tests_data/dota2api_data/simple"
-    account_id = "70388657"
+    dir_to_write = "./tests/data/dota2api_data/simple"
+    account_id = "86745912"
     limit = 10
 
     async with ClientSession() as client:
